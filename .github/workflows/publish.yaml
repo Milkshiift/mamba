@@ -93,7 +93,7 @@ jobs:
 
       - name: Set up swap space
         if: runner.os == 'Linux'
-        uses: pierotofy/set-swap-space@v1.0
+        uses: pierotofy/set-swap-space@master
         with:
           swap-size-gb: 10
 
@@ -121,8 +121,8 @@ jobs:
           # e.g. we can have system CUDA version being 11.7 but if torch==1.12 then we need to download the wheel from cu116
           # This code is ugly, maybe there's a better way to do this.
           export TORCH_CUDA_VERSION=$(python -c "from os import environ as env; \
-            minv = {'2.1': 118, '2.2': 118, '2.3': 118, '2.4': 118, '2.5': 118, '2.6': 118}[env['MATRIX_TORCH_VERSION']]; \
-            maxv = {'2.1': 121, '2.2': 121, '2.3': 121, '2.4': 124, '2.5': 124, '2.6': 124}[env['MATRIX_TORCH_VERSION']]; \
+            minv = {'2.1': 118, '2.2': 118, '2.3': 118, '2.4': 118, '2.5': 118, '2.6': 118, '2.7': 121 }[env['MATRIX_TORCH_VERSION']]; \
+            maxv = {'2.1': 121, '2.2': 121, '2.3': 121, '2.4': 124, '2.5': 124, '2.6': 126, '2.7': 128 }[env['MATRIX_TORCH_VERSION']]; \
             print(minv if int(env['MATRIX_CUDA_VERSION']) < 120 else maxv)" \
           )
           if [[ ${{ matrix.torch-version }} == *"dev"* ]]; then
@@ -130,8 +130,8 @@ jobs:
             # Can't use --no-deps because we need cudnn etc.
             # Hard-coding this version of pytorch-triton for torch 2.6.0.dev20241001
             pip install jinja2
-            pip install https://download.pytorch.org/whl/nightly/pytorch_triton-3.1.0%2Bcf34004b8a-cp${MATRIX_PYTHON_VERSION}-cp${MATRIX_PYTHON_VERSION}-linux_x86_64.whl
-            pip install --no-cache-dir --pre https://download.pytorch.org/whl/nightly/cu${TORCH_CUDA_VERSION}/torch-${{ matrix.torch-version }}%2Bcu${TORCH_CUDA_VERSION}-cp${MATRIX_PYTHON_VERSION}-cp${MATRIX_PYTHON_VERSION}-linux_x86_64.whl
+            pip install https://download.pytorch.org/whl/nightly/pytorch_triton-3.2.0-cp${MATRIX_PYTHON_VERSION}-cp${MATRIX_PYTHON_VERSION}-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+            pip install --no-cache-dir --pre https://download.pytorch.org/whl/nightly/cu${TORCH_CUDA_VERSION}/torch-${{ matrix.torch-version }}%2Bcu${TORCH_CUDA_VERSION}-cp${MATRIX_PYTHON_VERSION}-cp${MATRIX_PYTHON_VERSION}-manylinux_2_28_x86_64.whl
           else
             pip install --no-cache-dir torch==${{ matrix.torch-version }} --index-url https://download.pytorch.org/whl/cu${TORCH_CUDA_VERSION}
           fi
